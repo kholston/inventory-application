@@ -2,4 +2,20 @@ extends layout
 
 block content
   h1= title
-  p Welcome to #{title}
+  p Welcome to #{title} 
+  p An inventory application for your Music Store.
+  
+  h1 Overview
+  
+  if error
+    p Error getting inventory overview
+    
+  else
+    p Your current inventory consists of:
+    
+    ul
+      li #[strong Total Items :] !{data.item_count} 
+      li #[strong Items In Stock :] !{data.item_in_stock_count}
+      li #[strong Individual Items :] !{data.item_instance_count}
+      li #[strong Manufacturers :] !{data.manufacturer_count}
+      li #[strong Categories :] !{data.category_count}
