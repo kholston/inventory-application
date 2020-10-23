@@ -29,7 +29,12 @@ exports.index = function(req, res) {
 };
 
 exports.item_list = function(req, res, next) {
-  res.send("NOT IMPLEMENTED: Item List");
+  Item.find({}, 'manufacturer name')
+    .populate('manufacturer')
+    .exec(function(err, list_items){
+      if(err){ return next(err); }
+      res.render('item_list', {title: "Item List", item_list: list_items})
+    })
 };
 exports.item_detail = function(req, res, next) {
   res.send("NOT IMPLEMENTED: Item Detail: " + req.params.id);
