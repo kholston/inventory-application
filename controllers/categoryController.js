@@ -3,6 +3,8 @@ var Item = require('../models/item');
 
 var async = require("async");
 
+const { body, validationResult } = require('express-validator');
+
 exports.category_list = function(req, res, next) {
   Category.find()
     .populate('category')
@@ -39,20 +41,111 @@ exports.category_detail = function(req, res, next) {
   })
 };
 exports.category_create_get = function(req, res, next) {
-  res.send("NOT IMPLEMENTED: Category create GET");
+  res.render('category_form', { title: "Create Category" });
 };
-exports.category_create_post = function(req, res, next) {
-  res.send("NOT IMPLEMENTED: Category create POST");
-};
+exports.category_create_post = [
+  body('name', 'Category name required').trim().isLength({ min: 1 }).escape(),
+  body('description', 'Category description required').trim().isLength({ min: 1 }).escape(),
+
+  (req, res, next) => {
+    var errors = validationResult(req);
+    var category = new Category({ name: req.body.name, description: req.body.description });
+
+    if (!errors.isEmpty()) {
+      res.render('category_form', {
+        title: 'Create Category',
+        category: category,
+        errors: errors.Array()
+      })
+      return;
+    }
+    else {
+      Category.findOne({ name: req.body.name }).exec(function(err, found_category) {
+        if (err) { return next(err) }
+        if (found_category) {
+          res.redirect(found_category.url);
+        }
+        else {
+          category.save(function(err) {
+            if (err) { return next(err) }
+            res.redirect(category.url)
+          })
+        }
+      })
+    }
+  }
+];
 exports.category_delete_get = function(req, res, next) {
-  res.send("NOT IMPLEMENTED: Category delete GET");
+  async.parallel({
+    category: function(callback) {
+      Category.findById(req.params.id).exec(callback);
+    },
+    category_items: function(callback) {
+      Item.find({ 'category': req.params.id }).exec(callback);
+    }
+  }, function(err, results) {
+    if (err) { return next(err) }
+    if (results.category == null) {
+      res.redirect('/inventory/categories');
+    }
+    res.render('category_delete', { title: "Delete Category", category: results.category, category_items: results.category_items });
+  })
 };
 exports.category_delete_post = function(req, res, next) {
-  res.send("NOT IMPLEMENTED: Category delete POST");
+  async.parallel({
+    category: function(callback) {
+      Category.findById(req.params.id).exec(callback);
+    },
+    category_items: function(callback) {
+      Item.find({ 'category': req.params.id }).exec(callback);
+    }
+  }, function(err, results) {
+    if (err) { return next(err) }
+    if (results.category_items.length > 0) {
+      res.render('category_delete', { title: "Delete Category", category: results.category, category_items: results.category_items });
+      return;
+    }
+    else {
+      Category.findByIdAndRemove(req.body.id, function deleteCategory(err) {
+        if (err) { return next(err) }
+        res.redirect('/inventory/categories');
+      })
+    }
+  })
 };
 exports.category_update_get = function(req, res, next) {
-  res.send("NOT IMPLEMENTED: Category update GET");
+  Category.findById(req.params.id, function(err, category) {
+    if (err) { return next(err) }
+    if (category == null) {
+      var err = new Error('Category not found');
+      err.status = 404;
+      return next(err);
+    }
+    res.render('category_form', { title: 'Update Category', category: category })
+  })
 };
-exports.category_update_post = function(req, res, next) {
-  res.send("NOT IMPLEMENTED: Category update POST");
-};
+exports.category_update_post = [
+  body('name', 'Category name required').trim().isLength({ min: 1 }).escape(),
+  body('description', 'Category description required').trim().isLength({ min: 1 }).escape(),
+
+  (req, res, next) => {
+    var errors = validationResult(req);
+    var category = new Category({ _id: req.params.id, name: req.body.name, description: req.body.description });
+
+    if (!errors.isEmpty()) {
+      res.render('category_form', {
+        title: 'Update Category',
+        category: category,
+        errors: errors.Array()
+      })
+      return;
+    }
+    else {
+      Category.findByIdAndUpdate(req.params.id, category, {}, function(err, thecategory) {
+        if (err) { return next(err) }
+        res.redirect(thecategory.url);
+      })
+
+    }
+  }
+];
