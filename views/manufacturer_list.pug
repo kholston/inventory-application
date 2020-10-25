@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  h1=title
+  
+  ul(class="list-group")
+    each manufacturer in manufacturer_list
+      li(class="list-group-item")
+        a(href=manufacturer.url) #{manufacturer.name }: #{manufacturer.description}
+    
+    else
+      li There currently no manufacturers.

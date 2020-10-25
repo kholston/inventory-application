@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  h1=title
+  
+  ul(class="list-group")
+    each val in iteminstance_list
+      li(class="list-group-item")
+        a(href=val.url) #{val.item.name}
+        p #[strong Serial Number] #{val.serial_number}
+    else
+      li(class="list-group-item") Item currently out of stock.
+      

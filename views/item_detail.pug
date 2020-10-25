@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  h1 #[strong Item:] #{item.name}
+  
+  p #[strong Manufacturer:] #{item.manufacturer.name} 
+  p #[strong Description:] #{item.description}
+  p #[strong Price: ] $#{item.price}
+  p #[strong Stock Amount:] #{item.number_in_stock}
+  p #[strong Category: ]
+    each val,index in item.category
+      a(href=val.url) #{val.name}
+      if index < item.category.length -1
+        |,
+  div(style="margin-left:20px;margin-top:20px;")
+    h4 Invidual Items
+    
+    each val in item_instances
+      p #[strong Serial #: ] #{val.serial_number}
+      p #[strong Id: ]
+        a(href=val.url) #{val.id}
+      div 
+        hr
+    else
+      p(class="text-danger") Currently Out of Stock
