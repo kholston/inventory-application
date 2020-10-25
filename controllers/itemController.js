@@ -31,13 +31,32 @@ exports.index = function(req, res) {
 exports.item_list = function(req, res, next) {
   Item.find({}, 'manufacturer name')
     .populate('manufacturer')
-    .exec(function(err, list_items){
-      if(err){ return next(err); }
-      res.render('item_list', {title: "Item List", item_list: list_items})
+    .exec(function(err, list_items) {
+      if (err) { return next(err); }
+      res.render('item_list', { title: "Item List", item_list: list_items })
     })
 };
 exports.item_detail = function(req, res, next) {
-  res.send("NOT IMPLEMENTED: Item Detail: " + req.params.id);
+  async.parallel({
+    item: function(callback) {
+      Item.findById(req.params.id)
+        .populate("manufacturer")
+        .populate('category')
+        .exec(callback);
+    },
+    item_instance: function(callback) {
+      ItemInstance.find({ "item": req.params.id }).exec(callback);
+    }
+  }, function(err, results) {
+    if (err) { return next(err); }
+    if (results.item == null) {
+      var err = new Error("Item not found");
+      err.status = 404;
+      return next(err);
+    }
+    res.render('item_detail', { title: `${results.item.manufacturer.name} ${results.item.name}`, item: results.item, item_instances: results.item_instance })
+  })
+
 };
 exports.item_create_get = function(req, res, next) {
   res.send("NOT IMPLEMENTED: Item create GET");
