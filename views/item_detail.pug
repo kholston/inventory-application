@@ -23,3 +23,9 @@ block content
         hr
     else
       p(class="text-danger") Currently Out of Stock
+
+  hr
+  p
+    a(href=item.url+'/delete') Delete Item
+  p
+    a(href=item.url+'/update') Update Item

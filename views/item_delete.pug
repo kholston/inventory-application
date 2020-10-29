@@ -1,0 +1,38 @@
+extends layout
+
+block content
+
+  h1 #{title}: #{item.name}
+
+  p #[strong Manufacturer:] #{item.manufacturer.name}  
+  p #[strong Description:] #{item.description}
+  p #[strong Price:] #{item.price}
+  p #[strong Number in Stock:] #{item.number_in_stock}
+  p #[strong Category:]
+    each val in item.category
+      a(href=val.url) #{val.name}
+      |,
+
+  hr
+
+  if item_instances.length
+
+    p #[strong Delete the following items before attempting to delete this Item.]
+
+    div(style="margin-left:20px;margin-top:20px")
+
+      h4 Items
+
+        each item in item_instances
+          hr
+          p #[strong Serial Number:] #{item.serial_number}
+          p #[strong ID:]
+            a(href=item.url) #{item._id}
+
+  else
+    p Do you really want to delete this Item?
+
+    form(method="POST" action='')
+      div.form-group
+        input#id.form-control(type='hidden',name='id', required="true", value=item._id )
+      button.btn.btn-primary(type='submit') Delete
