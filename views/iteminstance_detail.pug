@@ -8,3 +8,8 @@ block content
     a(href=iteminstance.item.url) #{iteminstance.item.name}
   p #[strong Serial Number: ] #{iteminstance.serial_number}
   
+  hr
+  p
+    a(href=iteminstance.url+"/delete") Delete Item Instance
+  p
+    a(href=iteminstance.url+"/update") Update Item Instance
