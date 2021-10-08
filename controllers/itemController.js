@@ -84,7 +84,7 @@ exports.item_create_post = [
   body('manufacturer', "Manufacturer name must not be empty").trim().isLength({ min: 1 }).escape(),
   body('description', 'Item Description must not be empty').trim().isLength({ min: 1 }).escape(),
   body('price', 'Item price must not be empty').trim().isLength({ min: 1 }).escape(),
-  body('category.*').trim().isLength({ min: 1 }).escape(),
+  body('category').trim().isLength({ min: 1 }).escape(),
 
   (req, res, next) => {
     const errors = validationResult(req);
