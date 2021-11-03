@@ -27,9 +27,6 @@ The application requires a connection to a MongoDB Database which can be install
 
 ## Usage
 
-
-## Deployment
-
 npm
 ```bash
 npm start
